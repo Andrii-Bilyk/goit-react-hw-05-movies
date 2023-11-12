@@ -1,16 +1,15 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { fetchInformationMovie, fetchActorsOfMovie, fetchReviewsOfMovie } from 'Api/Api';
-
-const Cast = lazy(() => import('../Cast/Cast'));
-const Reviews = lazy(() => import('../Reviews/Reviews'));
+import React, { useEffect, useState, useRef, Suspense } from 'react';
+import { useParams, useNavigate, Link, Outlet, useLocation} from 'react-router-dom';
+import { fetchInformationMovie } from 'Api/Api';
 
 const MovieDetails = () => {
   const { movieId } = useParams();
   const [movieDetails, setMovieDetails] = useState(null);
-  const [cast, setCast] = useState(null);
-  const [reviews, setReviews] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const reviewsRef = useRef(null);
+  const castRef = useRef(null);
+  const goBackRef = useRef(location.state?.from || '/');
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -22,34 +21,22 @@ const MovieDetails = () => {
       }
     };
 
-    const fetchMovieCast = async () => {
-      try {
-        const castData = await fetchActorsOfMovie(movieId);
-        setCast(castData.cast);
-      } catch (error) {
-        console.error('Error fetching movie cast:', error);
-      }
-    };
-
-    const fetchMovieReviews = async () => {
-      try {
-        const reviewsData = await fetchReviewsOfMovie(movieId);
-        setReviews(reviewsData.results);
-      } catch (error) {
-        console.error('Error fetching movie reviews:', error);
-      }
-    };
-
     fetchMovieDetails();
-    fetchMovieCast();
-    fetchMovieReviews();
   }, [movieId]);
 
+  useEffect(() => {
+    if (location.pathname.endsWith('/reviews') && reviewsRef.current) {
+      reviewsRef.current.scrollIntoView();
+    } else if (location.pathname.endsWith('/cast') && castRef.current) {
+      castRef.current.scrollIntoView();
+    }
+  }, [location]);
+
   const handleGoBack = () => {
-    navigate(-1);
+    navigate(goBackRef.current);
   };
 
-  if (!movieDetails || !reviews) {
+  if (!movieDetails) {
     return <div>Loading...</div>;
   }
 
@@ -85,9 +72,8 @@ const MovieDetails = () => {
           <Link to={`/movies/${movieId}/reviews`}>Reviews</Link>
         </li>
       </ul>
-      <Suspense fallback={<div>Loading...</div>}>
-        {cast && <Cast cast={cast} />}
-        {reviews && <Reviews reviews={reviews} />}
+      <Suspense>
+        <Outlet />
       </Suspense>
     </div>
   );

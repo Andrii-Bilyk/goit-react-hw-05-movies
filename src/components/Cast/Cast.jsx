@@ -20,7 +20,7 @@ const Cast = () => {
   }, [movieId]);
 
   if (!cast) {
-    return <div>Loading...</div>;
+    return;
   }
 
   return (

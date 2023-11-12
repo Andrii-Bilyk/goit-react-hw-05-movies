@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { fetchSearchMovie } from '../Api/Api';
 
-function Movies() {
+const Movies = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const handleSearch = () => {
-    fetchSearchMovie(searchQuery).then((data) => {
-      setSearchResults(data.results);
-    });
-  };
+  const handleSearch = useCallback((query) => {
+    if (query.trim() !== '') {
+      fetchSearchMovie(query).then((data) => {
+        setSearchResults(data.results);
+        setSearchParams({ query });
+      });
+    }
+  }, [setSearchParams]);
+
+  useEffect(() => {
+    const queryParam = searchParams.get('query');
+    if (queryParam) {
+      setSearchQuery(queryParam);
+      handleSearch(queryParam);
+    }
+  }, [searchParams, handleSearch]);
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      handleSearch();
+      handleSearch(searchQuery);
     }
   };
 
@@ -27,7 +39,7 @@ function Movies() {
         onChange={(e) => setSearchQuery(e.target.value)}
         onKeyPress={handleKeyPress}
       />
-      <button onClick={handleSearch}>Search</button>
+      <button onClick={() => handleSearch(searchQuery)}>Search</button>
 
       <ul>
         {searchResults.map((movie) => (
@@ -38,6 +50,6 @@ function Movies() {
       </ul>
     </div>
   );
-}
+};
 
 export default Movies;

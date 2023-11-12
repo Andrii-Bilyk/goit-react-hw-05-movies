@@ -1,23 +1,28 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Home from '../Pages/Home';
-import Movies from '../Pages/Movies';
-import MovieDetails from './MovieDetails/MovieDetails';
-import Cast from './Cast/Cast';
-import Reviews from './Reviews/Reviews';
-import Layout from './Layout/Layout';
+// App.jsx або де ви використовуєте <Routes>
+import { Routes, Route } from 'react-router-dom';
+// import Home from '../Pages/Home';
+// import Movies from '../Pages/Movies';
+// import MovieDetails from './MovieDetails/MovieDetails';
+// import Cast from './Cast/Cast';
+// import Reviews from './Reviews/Reviews';
+import { lazy } from 'react';
+
+const MovieDetails = lazy(() => import('./MovieDetails/MovieDetails'));
+const Cast = lazy(() => import('./Cast/Cast'));
+const Reviews = lazy(() => import('./Reviews/Reviews'));
+const Home = lazy(() => import('../Pages/Home'));
+const Movies = lazy(() => import('../Pages/Movies'));
 
 const App = () => {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/movies" element={<Movies />} />
-        <Route path="/movies/:movieId" element={<MovieDetails />} />
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/movies" element={<Movies />} />
+      <Route path="/movies/:movieId" element={<MovieDetails />}>
         <Route path="/movies/:movieId/cast" element={<Cast />} />
         <Route path="/movies/:movieId/reviews" element={<Reviews />} />
-      </Routes>
-    </Layout>
+      </Route>
+    </Routes>
   );
 };
 
