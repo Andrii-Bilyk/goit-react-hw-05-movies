@@ -7,8 +7,6 @@ const MovieDetails = () => {
   const [movieDetails, setMovieDetails] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const reviewsRef = useRef(null);
-  const castRef = useRef(null);
   const goBackRef = useRef(location.state?.from || '/');
 
   useEffect(() => {
@@ -24,13 +22,7 @@ const MovieDetails = () => {
     fetchMovieDetails();
   }, [movieId]);
 
-  useEffect(() => {
-    if (location.pathname.endsWith('/reviews') && reviewsRef.current) {
-      reviewsRef.current.scrollIntoView();
-    } else if (location.pathname.endsWith('/cast') && castRef.current) {
-      castRef.current.scrollIntoView();
-    }
-  }, [location]);
+
 
   const handleGoBack = () => {
     navigate(goBackRef.current);
@@ -45,7 +37,7 @@ const MovieDetails = () => {
   return (
     <div>
       <button onClick={handleGoBack}>Go Back</button>
-      <img src={`https://image.tmdb.org/t/p/w200${poster_path}`} alt={title} />
+      {poster_path&&<img src={`https://image.tmdb.org/t/p/w200${poster_path}`} alt={title} />}
       <h1>{title}</h1>
       <p>Release Date: {release_date}</p>
       {vote_average ? (

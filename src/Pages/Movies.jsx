@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { fetchSearchMovie } from '../Api/Api';
 
 const Movies = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
-
+const location = useLocation()
   const handleSearch = useCallback((query) => {
     if (query.trim() !== '') {
       fetchSearchMovie(query).then((data) => {
@@ -44,7 +44,7 @@ const Movies = () => {
       <ul>
         {searchResults.map((movie) => (
           <li key={movie.id}>
-            <Link to={`/movies/${movie.id}`}>{movie.title}</Link>
+            <Link state={{from:location}} to={`/movies/${movie.id}`}>{movie.title}</Link>
           </li>
         ))}
       </ul>
